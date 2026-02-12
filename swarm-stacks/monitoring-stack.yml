@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+    
+    volumes:
+      - prometheus-data:/prometheus
+    
+    networks:
+      - monitoring
+    
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    
+    networks:
+      - monitoring
+    
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    
+    networks:
+      - monitoring
+    
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+
+  grafana:
+    image: grafana/grafana:latest
+    
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=AdminPass123
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=https://grafana.faez-studio.fr
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    
+    volumes:
+      - grafana-data:/var/lib/grafana
+    
+    networks:
+      - monitoring
+      - traefik-public
+    
+    deploy:
+      mode: replicated
+      replicas: 1
+      
+      labels:
+        - traefik.enable=true
+        
+        - traefik.http.routers.grafana.rule=Host(`grafana.faez-studio.fr`)
+        - traefik.http.routers.grafana.entrypoints=websecure
+        - traefik.http.routers.grafana.tls.certresolver=letsencrypt
+        
+        - traefik.http.services.grafana.loadbalancer.server.port=3000
+      
+      placement:
+        constraints:
+          - node.role == manager
+      
+      restart_policy:
+        condition: on-failure
+
+networks:
+  monitoring:
+    driver: overlay
+    attachable: true
+  
+  traefik-public:
+    external: true
+
+volumes:
+  prometheus-data:
+  grafana-data:
+
+configs:
+  prometheus_config:
+    file: ./prometheus.yml

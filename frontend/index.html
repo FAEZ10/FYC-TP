@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Simple - Demo Swarm</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛒 Catalogue E-Commerce</h1>
+            <p class="subtitle">Application de démonstration Docker Swarm</p>
+            <div id="server-info" class="server-info"></div>
+        </header>
+
+        <main>
+            <!-- Formulaire d'ajout de produit -->
+            <section class="add-product-section">
+                <h2>➕ Ajouter un produit</h2>
+                <form id="product-form">
+                    <div class="form-group">
+                        <input type="text" id="name" placeholder="Nom du produit" required>
+                        <input type="number" id="price" placeholder="Prix (€)" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" id="stock" placeholder="Stock" value="0">
+                        <input type="text" id="description" placeholder="Description">
+                    </div>
+                    <button type="submit" class="btn-primary">Ajouter le produit</button>
+                </form>
+            </section>
+
+            <!-- Liste des produits -->
+            <section class="products-section">
+                <h2>📦 Produits disponibles</h2>
+                <div id="loading" class="loading">Chargement des produits...</div>
+                <div id="products-list" class="products-grid"></div>
+                <div id="error" class="error-message"></div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Made with ❤️ for Docker Swarm Training</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
