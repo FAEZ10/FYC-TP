@@ -3,8 +3,7 @@ version: '3.8'
 services:
   frontend:
     image: faezbacar/ecommerce-frontend:latest
-    # Pour le développement local sans registry:
-    # build: ../frontend
+
     
     networks:
       - traefik-public
@@ -17,17 +16,14 @@ services:
         - traefik.enable=true
         - traefik.docker.network=traefik_traefik-public
         
-        # Router HTTP (pour Let's Encrypt + redirection HTTPS)
         - traefik.http.routers.frontend-http.rule=Host(`app.faez-studio.fr`)
         - traefik.http.routers.frontend-http.entrypoints=web
         - traefik.http.routers.frontend-http.middlewares=frontend-https-redirect
         
-        # Router HTTPS
         - traefik.http.routers.frontend.rule=Host(`app.faez-studio.fr`)
         - traefik.http.routers.frontend.entrypoints=websecure
         - traefik.http.routers.frontend.tls.certresolver=letsencrypt
         
-        # Middleware de redirection HTTP → HTTPS
         - traefik.http.middlewares.frontend-https-redirect.redirectscheme.scheme=https
         - traefik.http.middlewares.frontend-https-redirect.redirectscheme.permanent=true
         
@@ -55,9 +51,7 @@ services:
 
   api:
     image: faezbacar/ecommerce-backend:latest
-    # Pour le développement local sans registry:
-    # build: ../backend
-    
+
     secrets:
       - db_password
     
@@ -85,17 +79,14 @@ services:
         - traefik.enable=true
         - traefik.docker.network=traefik_traefik-public
         
-        # Router HTTP (pour Let's Encrypt + redirection HTTPS)
         - traefik.http.routers.api-http.rule=Host(`api.faez-studio.fr`)
         - traefik.http.routers.api-http.entrypoints=web
         - traefik.http.routers.api-http.middlewares=api-https-redirect
         
-        # Router HTTPS
         - traefik.http.routers.api.rule=Host(`api.faez-studio.fr`)
         - traefik.http.routers.api.entrypoints=websecure
         - traefik.http.routers.api.tls.certresolver=letsencrypt
         
-        # Middleware de redirection HTTP → HTTPS
         - traefik.http.middlewares.api-https-redirect.redirectscheme.scheme=https
         - traefik.http.middlewares.api-https-redirect.redirectscheme.permanent=true
         
@@ -158,9 +149,7 @@ services:
       placement:
         constraints:
           - node.hostname == Node-1
-          # Alternative avec label: - node.labels.db == true
-          # (nécessite: docker node update --label-add db=true Node-1)
-      
+
       restart_policy:
         condition: on-failure
         delay: 5s
