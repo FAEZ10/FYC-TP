@@ -75,7 +75,7 @@ function displayProducts(products) {
             <div class="product-name">${escapeHtml(product.name)}</div>
             <div class="product-description">${escapeHtml(product.description || 'Pas de description')}</div>
             <div class="product-info">
-                <span class="product-price">${product.price.toFixed(2)} €</span>
+                <span class="product-price">${parseFloat(product.price).toFixed(2)} €</span>
                 <span class="product-stock ${getStockClass(product.stock)}">
                     Stock: ${product.stock}
                 </span>

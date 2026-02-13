@@ -18,12 +18,12 @@ services:
         - traefik.docker.network=traefik_traefik-public
         
         # Router HTTP (pour Let's Encrypt + redirection HTTPS)
-        - traefik.http.routers.frontend-http.rule=Host(`shop.faez-studio.fr`)
+        - traefik.http.routers.frontend-http.rule=Host(`app.faez-studio.fr`)
         - traefik.http.routers.frontend-http.entrypoints=web
         - traefik.http.routers.frontend-http.middlewares=frontend-https-redirect
         
         # Router HTTPS
-        - traefik.http.routers.frontend.rule=Host(`shop.faez-studio.fr`)
+        - traefik.http.routers.frontend.rule=Host(`app.faez-studio.fr`)
         - traefik.http.routers.frontend.entrypoints=websecure
         - traefik.http.routers.frontend.tls.certresolver=letsencrypt
         
