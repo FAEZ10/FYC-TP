@@ -96,6 +96,8 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+      
+      stop_grace_period: 10s
     
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/health"]
@@ -103,7 +105,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
-      stop_grace_period: 10s
 
   database:
     image: postgres:15-alpine
