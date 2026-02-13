@@ -154,6 +154,7 @@ services:
 networks:
   traefik-public:
     external: true
+    name: traefik_traefik-public
     
   frontend-net:
     driver: overlay
