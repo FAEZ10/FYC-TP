@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   traefik:
-    image: traefik:v2.10
+    image: traefik:v2.11
     command:
       - --api.dashboard=true
       - --api.insecure=false
@@ -48,10 +48,16 @@ services:
       labels:
         - traefik.enable=true
         
+        # Router HTTPS (avec SSL - une fois le certificat généré)
         - traefik.http.routers.dashboard.rule=Host(`traefik.faez-studio.fr`)
         - traefik.http.routers.dashboard.service=api@internal
         - traefik.http.routers.dashboard.entrypoints=websecure
         - traefik.http.routers.dashboard.tls.certresolver=letsencrypt
+        
+        # Router HTTP temporaire (sans SSL - pour accès immédiat)
+        - traefik.http.routers.dashboard-http.rule=Host(`traefik.faez-studio.fr`)
+        - traefik.http.routers.dashboard-http.service=api@internal
+        - traefik.http.routers.dashboard-http.entrypoints=web
         
         - traefik.http.services.dashboard.loadbalancer.server.port=8080
       
