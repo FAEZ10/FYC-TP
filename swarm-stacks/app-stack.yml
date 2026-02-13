@@ -64,6 +64,8 @@ services:
       - frontend-net
       - backend-net
     
+    stop_grace_period: 10s
+    
     deploy:
       mode: replicated
       replicas: 3
@@ -96,8 +98,6 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
-      
-      stop_grace_period: 10s
     
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/health"]
