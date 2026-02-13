@@ -15,10 +15,21 @@ services:
       
       labels:
         - traefik.enable=true
+        - traefik.docker.network=traefik_traefik-public
         
-        - traefik.http.routers.frontend.rule=Host(`app.faez-studio.fr`)
+        # Router HTTP (pour Let's Encrypt + redirection HTTPS)
+        - traefik.http.routers.frontend-http.rule=Host(`shop.faez-studio.fr`)
+        - traefik.http.routers.frontend-http.entrypoints=web
+        - traefik.http.routers.frontend-http.middlewares=frontend-https-redirect
+        
+        # Router HTTPS
+        - traefik.http.routers.frontend.rule=Host(`shop.faez-studio.fr`)
         - traefik.http.routers.frontend.entrypoints=websecure
         - traefik.http.routers.frontend.tls.certresolver=letsencrypt
+        
+        # Middleware de redirection HTTP → HTTPS
+        - traefik.http.middlewares.frontend-https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.frontend-https-redirect.redirectscheme.permanent=true
         
         - traefik.http.services.frontend.loadbalancer.server.port=80
         
@@ -72,10 +83,21 @@ services:
       
       labels:
         - traefik.enable=true
+        - traefik.docker.network=traefik_traefik-public
         
+        # Router HTTP (pour Let's Encrypt + redirection HTTPS)
+        - traefik.http.routers.api-http.rule=Host(`api.faez-studio.fr`)
+        - traefik.http.routers.api-http.entrypoints=web
+        - traefik.http.routers.api-http.middlewares=api-https-redirect
+        
+        # Router HTTPS
         - traefik.http.routers.api.rule=Host(`api.faez-studio.fr`)
         - traefik.http.routers.api.entrypoints=websecure
         - traefik.http.routers.api.tls.certresolver=letsencrypt
+        
+        # Middleware de redirection HTTP → HTTPS
+        - traefik.http.middlewares.api-https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.api-https-redirect.redirectscheme.permanent=true
         
         - traefik.http.services.api.loadbalancer.server.port=8080
         
