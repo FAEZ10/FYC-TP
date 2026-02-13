@@ -96,16 +96,27 @@ services:
       
       labels:
         - traefik.enable=true
+        - traefik.docker.network=traefik_traefik-public
         
+        # Router HTTP (redirection vers HTTPS)
+        - traefik.http.routers.grafana-http.rule=Host(`grafana.faez-studio.fr`)
+        - traefik.http.routers.grafana-http.entrypoints=web
+        - traefik.http.routers.grafana-http.middlewares=grafana-https-redirect
+        
+        # Router HTTPS
         - traefik.http.routers.grafana.rule=Host(`grafana.faez-studio.fr`)
         - traefik.http.routers.grafana.entrypoints=websecure
         - traefik.http.routers.grafana.tls.certresolver=letsencrypt
+        
+        # Middleware de redirection HTTP → HTTPS
+        - traefik.http.middlewares.grafana-https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.grafana-https-redirect.redirectscheme.permanent=true
         
         - traefik.http.services.grafana.loadbalancer.server.port=3000
       
       placement:
         constraints:
-          - node.role == manager
+          - node.hostname == Node-1
       
       restart_policy:
         condition: on-failure
@@ -117,6 +128,7 @@ networks:
   
   traefik-public:
     external: true
+    name: traefik_traefik-public
 
 volumes:
   prometheus-data:
